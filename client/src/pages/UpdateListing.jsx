@@ -8,8 +8,7 @@ import {
 import { app } from '../firebase';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-
-export default function UpdateListing() {
+export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const params = useParams();
@@ -32,7 +31,6 @@ export default function UpdateListing() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     const fetchListing = async () => {
       const listingId = params.listingId;
@@ -44,17 +42,14 @@ export default function UpdateListing() {
       }
       setFormData(data);
     };
-
     fetchListing();
   }, []);
-
   // eslint-disable-next-line no-unused-vars
   const handleImageSubmit = (e) => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       setUploading(true);
       setImageUploadError(false);
       const promises = [];
-
       for (let i = 0; i < files.length; i++) {
         promises.push(storeImage(files[i]));
       }
@@ -77,7 +72,6 @@ export default function UpdateListing() {
       setUploading(false);
     }
   };
-
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
       const storage = getStorage(app);
@@ -102,14 +96,12 @@ export default function UpdateListing() {
       );
     });
   };
-
   const handleRemoveImage = (index) => {
     setFormData({
       ...formData,
       imageUrls: formData.imageUrls.filter((_, i) => i !== index),
     });
   };
-
   const handleChange = (e) => {
     if (e.target.id === 'sale' || e.target.id === 'rent') {
       setFormData({
@@ -117,7 +109,6 @@ export default function UpdateListing() {
         type: e.target.id,
       });
     }
-
     if (
       e.target.id === 'parking' ||
       e.target.id === 'furnished' ||
@@ -128,7 +119,6 @@ export default function UpdateListing() {
         [e.target.id]: e.target.checked,
       });
     }
-
     if (
       e.target.type === 'number' ||
       e.target.type === 'text' ||
@@ -140,7 +130,6 @@ export default function UpdateListing() {
       });
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -299,7 +288,9 @@ export default function UpdateListing() {
               />
               <div className='flex flex-col items-center'>
                 <p>Regular price</p>
-                <span className='text-xs'>($ / month)</span>
+                {formData.type === 'rent' && (
+                  <span className='text-xs'>($ / month)</span>
+                )}
               </div>
             </div>
             {formData.offer && (
@@ -316,7 +307,9 @@ export default function UpdateListing() {
                 />
                 <div className='flex flex-col items-center'>
                   <p>Discounted price</p>
-                  <span className='text-xs'>($ / month)</span>
+                  {formData.type === 'rent' && (
+                    <span className='text-xs'>($ / month)</span>
+                  )}
                 </div>
               </div>
             )}
@@ -374,7 +367,7 @@ export default function UpdateListing() {
             disabled={loading || uploading}
             className='p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80'
           >
-            {loading ? 'Creating...' : 'Update listing'}
+            {loading ? 'Updating...' : 'Update listing'}
           </button>
           {error && <p className='text-red-700 text-sm'>{error}</p>}
         </div>
